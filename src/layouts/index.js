@@ -13,7 +13,7 @@ function BasicLayout(props) {
         label: '代码生成器',
         description: '一款好用智能的代码生成工具',
         img: '/images/1.png',
-        path: '',
+        path: '/tools/code-generate',
       },
       {
         label: 'JSON格式化',
@@ -30,10 +30,11 @@ function BasicLayout(props) {
     ],
   };
 
+  const path = props.location.pathname;
+
   return (
     <div>
-      <div className={styles['header']}>
-
+      <div className={styles['header']} style={{ height: path === '/' ? '600px' : '90px' }}>
         <div className={styles['menu-bar']}>
           <div style={{ display: 'flex' }}>
             <div style={{
@@ -56,13 +57,14 @@ function BasicLayout(props) {
           </div>
 
           <div style={{ display: 'flex', marginTop: 5 }}>
-            <a style={{ color: '#fff' }}>首页</a>
+            <a style={{ color: '#fff' }} href={'/'}>首页</a>
             <DMenu data={data} overlayStyle={{ color: '#fff' }} />
             <DMenu data={data} overlayStyle={{ color: '#fff' }} />
           </div>
+
         </div>
 
-        <div className={styles['header-content']}>
+        {path === '/' ? <div className={styles['header-content']}>
           <div className={styles['header-content-title']}>
             Programmer Tools
           </div>
@@ -71,14 +73,14 @@ function BasicLayout(props) {
           </div>
           <Button style={{ borderRadius: 50 }} size='large' type={'primary'}>开始使用</Button>
           <Button style={{ borderRadius: 50, marginLeft: '20px' }} size='large'>使用文档</Button>
-        </div>
+        </div> : null}
       </div>
 
       {props.children}
 
       <div className={styles['footer']}>
         <span style={{ color: '#fff' }}>Copyright © 2020 万乔软件技术有限公司</span>
-        <a style={{ marginLeft: '20px' ,color:'#3765a1'}}>weipingdeng@qq.com</a>
+        <a style={{ marginLeft: '20px', color: '#3765a1' }}>weipingdeng@qq.com</a>
       </div>
     </div>
   );

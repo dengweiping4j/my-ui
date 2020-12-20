@@ -27,20 +27,22 @@ class IndexPage extends Component {
     ];
 
     return (
-      <div>
+      <div style={{ padding: '20px 40px' }}>
         <div className={styles['title']}>博主推荐</div>
 
         <List
           style={{ margin: 20 }}
           grid={{ gutter: 16, column: 3 }}
           dataSource={data}
-          renderItem={item => (
-            <List.Item style={{
-              display: 'flex',
-              height: '250px',
-              background: '#f6f6f6',
-              padding: '40px',
-            }}>
+          renderItem={(item, index) => (
+            <List.Item
+              key={index}
+              style={{
+                display: 'flex',
+                height: '250px',
+                background: '#f6f6f6',
+                padding: '40px',
+              }}>
               <div>
                 <div className={styles['item-title']}>{item.title}</div>
                 <div className={styles['item-description']}>{item.description}</div>
@@ -48,7 +50,7 @@ class IndexPage extends Component {
               <img src={item.icon} className={styles['item-icon']} />
             </List.Item>
           )}
-        />,
+        />
       </div>
     );
   }
