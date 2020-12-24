@@ -45,7 +45,7 @@ function BasicLayout(props) {
               textAlign: 'center',
               paddingTop: '6px',
             }}>
-              <img src={'/images/logo.png'} style={{ width: 30, height: 25 }} />
+              <img src={'/images/logo2.svg'} style={{ width: 30, height: 25 }} />
             </div>
             <span style={{
               fontFamily: '楷体',

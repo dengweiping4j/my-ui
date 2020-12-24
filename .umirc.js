@@ -18,7 +18,14 @@ export default {
       antd: true,
       dva: false,
       dynamicImport: false,
-      title: 'my-ui',
+      title: '程序员工具箱',
+      links:[
+        {
+          rel:'icon',
+          href:'/images/logo2.svg'
+        }
+      ],
+
       dll: false,
 
       routes: {
@@ -28,4 +35,13 @@ export default {
       },
     }],
   ],
+
+  proxy: {
+    '/api': {
+      'target': 'http://localhost:8080',
+      'changeOrigin': true,
+      'pathRewrite': { '^/api' : '' },
+    },
+  },
+
 }
