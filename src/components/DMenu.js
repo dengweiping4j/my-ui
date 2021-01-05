@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Divider, Dropdown, Menu } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import styles from './DMenu.less';
 
 class DMenu extends Component {
@@ -33,9 +34,9 @@ class DMenu extends Component {
 
     return (
       <div style={{ marginLeft: '40px', ...this.props.style }}>
-        <Dropdown overlay={overlay} placement="bottomCenter" arrow>
+        <Dropdown overlay={overlay} placement='bottomCenter' arrow>
           <a onClick={e => e.preventDefault()} style={{ ...this.props.overlayStyle }}>
-            {data.label}
+            {data.label}<DownOutlined style={{ marginLeft: '10px', color: '#5a9bff' }} />
           </a>
         </Dropdown>
       </div>

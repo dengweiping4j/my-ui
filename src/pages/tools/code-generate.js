@@ -1,10 +1,30 @@
 import React, { Component } from 'react';
 import styles from './code-generate.less';
 import { Button, Divider, Input, List, Table } from 'antd';
+import { connect } from 'dva';
 
 const { Search } = Input;
 
+@connect(({ redis }) => ({
+  redis,
+}))
 class CodeGenerate extends Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    this.props.dispatch({
+      type: 'redis/read',
+      payload: {
+        name: 'name',
+      },
+      callback: response => {
+        console.log('response', response);
+      },
+    });
+  }
 
   render() {
 
@@ -106,9 +126,9 @@ class CodeGenerate extends Component {
 
         <div className={styles['left-two']}>
           <Search
-            placeholder="请输入搜索内容"
+            placeholder='请输入搜索内容'
             allowClear
-            enterButton="搜索"
+            enterButton='搜索'
           />
         </div>
 

@@ -13,7 +13,7 @@ function BasicLayout(props) {
         label: '代码生成器',
         description: '一款好用智能的代码生成工具',
         img: '/images/1.png',
-        path: '/tools/code-generate',
+        path: '/#/tools/code-generate',
       },
       {
         label: 'JSON格式化',
@@ -79,7 +79,7 @@ function BasicLayout(props) {
       {props.children}
 
       <div className={styles['footer']}>
-        <span style={{ color: '#fff' }}>Copyright © 2020 万乔软件技术有限公司</span>
+        <span style={{ color: '#fff' }}>Copyright © 2020 平平软件技术有限公司</span>
         <a style={{ marginLeft: '20px', color: '#3765a1' }}>weipingdeng@qq.com</a>
       </div>
     </div>

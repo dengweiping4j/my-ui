@@ -1,47 +1,44 @@
-
 // ref: https://umijs.org/config/
 export default {
   treeShaking: true,
-/* 此处配置放开后会导致umi不使用自动路由
- routes: [
-    {
-      path: '/',
-      component: '../layouts/index',
-      routes: [
-        { path: '/', component: '../pages/index' }
-      ]
-    }
-  ],*/
+  history: 'hash',
   plugins: [
     // ref: https://umijs.org/plugin/umi-plugin-react.html
     ['umi-plugin-react', {
       antd: true,
-      dva: false,
-      dynamicImport: false,
+      dva: true,
+      dynamicImport: { webpackChunkName: true },
       title: '程序员工具箱',
-      links:[
+      links: [
         {
-          rel:'icon',
-          href:'/images/logo2.svg'
-        }
+          rel: 'icon',
+          href: '/images/logo2.svg',
+        },
       ],
-
       dll: false,
+      locale: {
+        enable: true,
+        default: 'en-US',
+      },
 
       routes: {
         exclude: [
+          /models\//,
+          /services\//,
+          /model\.(t|j)sx?$/,
+          /service\.(t|j)sx?$/,
           /components\//,
         ],
       },
     }],
   ],
 
-  proxy: {
-    '/api': {
-      'target': 'http://localhost:8080',
-      'changeOrigin': true,
-      'pathRewrite': { '^/api' : '' },
-    },
-  },
+  /*  proxy: {
+      '/api': {
+        'target': 'http://localhost:8080',
+        'changeOrigin': true,
+        'pathRewrite': { '^/api': '' },
+      },
+    },*/
 
-}
+};
