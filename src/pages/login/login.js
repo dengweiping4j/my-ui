@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
 import { Button, Divider, Input, Modal, Tabs } from 'antd';
+import { connect } from 'dva';
 
 const { TabPane } = Tabs;
 
+@connect(({ login }) => ({
+  login,
+}))
 class LoginPage extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
       currentTab: '1',
+      formData: {},
     };
   }
 
@@ -20,7 +25,12 @@ class LoginPage extends Component {
   };
 
   onFormChange = (key, value) => {
+    const { formData } = this.state;
+    formData[key] = value;
 
+    this.setState({
+      formData,
+    });
   };
 
   cancel = () => {
@@ -28,13 +38,25 @@ class LoginPage extends Component {
   };
 
   onOk = () => {
-    this.props.onOk();
+    const { formData } = this.state;
+
+    this.props.dispatch({
+      type: 'user/login',
+      payload: {
+        data: formData,
+      },
+      callback: response => {
+        console.log('response', response);
+        this.props.onOk();
+      },
+    });
   };
 
   render() {
 
     const { visible } = this.props;
-    const { currentTab, userName, password } = this.state;
+    const { currentTab, formData } = this.state;
+    const { userName, password } = formData;
 
     return <Modal
       visible={visible}
@@ -48,9 +70,10 @@ class LoginPage extends Component {
       <Tabs activeKey={currentTab} onChange={this.onChange}>
         <TabPane tab='登录' key='1'>
           <Input
+            style={{ marginTop: '20px' }}
             placeholder={'用户名'}
             value={userName}
-            onChange={(e) => this.onFormChange('password', e.target.value)}
+            onChange={(e) => this.onFormChange('userName', e.target.value)}
             bordered={false}
           />
           <Divider style={{ margin: '10px 0px' }} />
@@ -64,7 +87,7 @@ class LoginPage extends Component {
           />
           <Divider style={{ margin: '10px 0px' }} />
 
-          <Button type={'primary'} style={{ marginTop: '40px' }} onClick={this.onOk} block>登录</Button>
+          <Button type={'primary'} style={{ marginTop: '20px' }} onClick={this.onOk} block>登录</Button>
 
           <div style={{ marginTop: '20px' }}>
             <div style={{ fontSize: '12px', color: '#525253' }}>登录即代表同意《隐私保护协议》</div>

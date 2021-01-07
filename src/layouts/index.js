@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import DMenu from '@/components/DMenu';
 import styles from './index.less';
 import { Button } from 'antd';
-import LoginPage from '@/pages/login';
+import LoginPage from '@/pages/login/login';
 
 class BasicLayout extends Component {
 
