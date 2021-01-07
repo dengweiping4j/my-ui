@@ -21,7 +21,7 @@ class CodeGenerate extends Component {
         name: 'name',
       },
       callback: response => {
-        console.log('response', response);
+        console.log('data', response);
       },
     });
   }

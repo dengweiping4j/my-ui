@@ -4,8 +4,8 @@
  * 更详细的 api 文档: https://github.com/umijs/umi-request
  */
 import { extend } from 'umi-request';
-import { notification } from 'antd';
-
+import { router } from 'umi';
+import { message } from 'antd';
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -30,18 +30,31 @@ const codeMessage = {
  */
 const errorHandler = error => {
   const { response } = error;
-
+  console.log('response', response);
   if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
-    notification.error({
-      message: `请求错误 ${status}: ${url}`,
-      description: errorText,
-    });
+    message.error(codeMessage[response.status]);
+
+    switch (response.status) {
+      case 401:
+        router.push('/login');
+        break;
+      case 403:
+        router.push('/403');
+        break;
+      case 404:
+        router.push('/404');
+        break;
+      case 500:
+        router.push('/500');
+        break;
+    }
+  } else {
+    router.push('/500');
   }
 
   return response;
 };
+
 const request = extend({
   errorHandler,
   // 默认错误处理
@@ -88,7 +101,10 @@ request.interceptors.request.use(async (url, options) => {
 });
 
 // response拦截器, 处理response
-request.interceptors.response.use((response, options) => {
+request.interceptors.response.use((response) => {
+
+  console.log('response2', response);
+
   let token = response.headers.get('x-auth-token');
   if (token) {
     localStorage.setItem('x-auth-token', token);
