@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import DMenu from '@/components/DMenu';
 import styles from './index.less';
 import { Button } from 'antd';
-import LoginPage from '@/pages/login/login';
+import { router } from 'umi';
 
 class BasicLayout extends Component {
 
@@ -13,22 +13,8 @@ class BasicLayout extends Component {
     };
   }
 
-  openLogin = () => {
-    this.setState({
-      loginVisible: true,
-    });
-  };
-
-  login = () => {
-    this.setState({
-      loginVisible: false,
-    });
-  };
-
-  cancel = () => {
-    this.setState({
-      loginVisible: false,
-    });
+  toLogin = () => {
+    router.push('/login');
   };
 
   render() {
@@ -89,7 +75,7 @@ class BasicLayout extends Component {
             </div>
 
             <div style={{ marginTop: '5px' }}>
-              <a style={{ color: '#fff' }} onClick={this.openLogin}>登录 / 注册</a>
+              <a style={{ color: '#fff' }} onClick={this.toLogin}>登录 / 注册</a>
             </div>
 
           </div>
@@ -113,12 +99,6 @@ class BasicLayout extends Component {
           <span style={{ color: '#fff' }}>Copyright © 2020 平平软件技术有限公司</span>
           <a style={{ marginLeft: '20px', color: '#3765a1' }}>weipingdeng@qq.com</a>
         </div>
-
-        <LoginPage
-          visible={this.state.loginVisible}
-          onOk={this.login}
-          onCancel={this.cancel}
-        />
 
       </div>
     );

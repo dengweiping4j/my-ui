@@ -1,11 +1,17 @@
-// An highlighted block
-/**
- * request 网络请求工具
- * 更详细的 api 文档: https://github.com/umijs/umi-request
- */
-import { extend } from 'umi-request';
-import { router } from 'umi';
-import { message } from 'antd';
+import fetch from 'dva/fetch';
+// import crypto from 'crypto';
+// import uuidv1 from 'uuid/v1';
+import router from 'umi/router';
+
+import hash from 'hash.js';
+
+import { loginURL } from '@/utils/constants';
+
+import QProgress from 'qier-progress';
+
+const qprogress = new QProgress();
+
+const csrfTokenKey = `csrfToken`;
 
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -25,92 +31,142 @@ const codeMessage = {
   504: '网关超时。',
 };
 
-/**
- * 异常处理程序
- */
-const errorHandler = error => {
-  const { response } = error;
-  console.log('response', response);
-  if (response && response.status) {
-    message.error(codeMessage[response.status]);
-
-    switch (response.status) {
-      case 401:
-        router.push('/login');
-        break;
-      case 403:
-        router.push('/403');
-        break;
-      case 404:
-        router.push('/404');
-        break;
-      case 500:
-        router.push('/500');
-        break;
-    }
-  } else {
-    router.push('/500');
+function checkStatus(response) {
+  console.log('response =', response);
+  if (response.status >= 200 && response.status < 300) {
+    return response;
+  }
+  if (response.status === 422) {
+    return response;
   }
 
+
+  const errortext = codeMessage[response.status] || response.statusText;
+  // notification.error({
+  //   message: `请求错误 ${response.status}: ${response.url}`,
+  //   description: errortext,
+  // });
+  const error = new Error(errortext);
+  error.name = response.status;
+  error.response = response;
+  throw error;
+}
+
+const cachedSave = (response, hashcode) => {
+  /**
+   * Clone a response data and store it in sessionStorage
+   * Does not support data other than json, Cache only json
+   */
+  const contentType = response.headers.get('Content-Type');
+  if (contentType && contentType.match(/application\/json/i)) {
+    // All data is saved as text
+    response
+      .clone()
+      .text()
+      .then(content => {
+        sessionStorage.setItem(hashcode, content);
+        sessionStorage.setItem(`${hashcode}:timestamp`, Date.now());
+      });
+  }
   return response;
 };
 
-const request = extend({
-  errorHandler,
-  // 默认错误处理
-  credentials: 'include', // 默认请求是否带上cookie
+/**
+ * Requests a URL, returning a promise.
+ *
+ * @param  {string} url       The URL we want to request
+ * @param  {object} [options] The options we want to pass to "fetch"
+ * @return {object}           An object containing either "data" or "err"
+ */
+export default function request(url, option) {
+  const options = {
+    expirys: false,
+    ...option,
+  };
+  /**
+   * Produce fingerprints based on url and parameters
+   * Maybe url has the same parameters
+   */
+  const fingerprint = url + (options.body ? JSON.stringify(options.body) : '');
+  const hashcode = hash
+    .sha256()
+    .update(fingerprint)
+    .digest('hex');
 
-});
+  const defaultOptions = {
+    credentials: 'include',
+    headers: {
+      'X-CSRF-TOKEN': localStorage.getItem(csrfTokenKey) || '',
+    },
+  };
 
-// request拦截器, 改变url 或 options.
-request.interceptors.request.use(async (url, options) => {
 
-  let c_token = localStorage.getItem('x-auth-token');
-  if (c_token) {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'x-auth-token': c_token,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'X-Requested-With',
-      'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
-    };
-    return (
-      {
-        url: url,
-        options: { ...options, headers: headers },
-      }
-    );
+  const newOptions = { ...defaultOptions, ...options };
+
+  if (newOptions.method === 'POST' || newOptions.method === 'PUT' || newOptions.method === 'DELETE') {
+    if (!(newOptions.body instanceof FormData)) {
+      newOptions.headers = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
+        ...newOptions.headers,
+      };
+      newOptions.body = JSON.stringify(newOptions.body);
+    } else {
+      // newOptions.body is FormData
+      newOptions.headers = {
+        Accept: 'application/json',
+        ...newOptions.headers,
+      };
+    }
   } else {
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'x-auth-token': c_token,
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'X-Requested-With',
-      'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
+    newOptions.headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
+      ...newOptions.headers,
     };
-    return (
-      {
-        url: url,
-        options: { ...options, headers: headers },
+  }
+
+  qprogress.start();
+
+  return fetch(url, newOptions)
+    .then(checkStatus)
+    .then(response => {
+      return cachedSave(response, hashcode);
+    })
+    .then(response => response.json())
+    .then(responseJSON => {
+      return responseJSON;
+    })
+    .catch(e => {
+      const status = e.name;
+      if (status === 401) {
+        // @HACK
+        /* eslint-disable no-underscore-dangle */
+        console.log('##### 401');
+        // message.error('登录信息已失效，请登录');
+        if (loginURL === '/login') {
+          router.push(loginURL);
+        } else {
+          window.location.replace(loginURL);
+        }
+
+        return;
       }
-    );
-  }
-
-});
-
-// response拦截器, 处理response
-request.interceptors.response.use((response) => {
-
-  console.log('response2', response);
-
-  let token = response.headers.get('x-auth-token');
-  if (token) {
-    localStorage.setItem('x-auth-token', token);
-  }
-  return response;
-});
-
-
-export default request;
+      if (status === 403) {
+        console.log('##### 403');
+        router.push('/403');
+        return;
+      }
+      if (status <= 504 && status >= 500) {
+        router.push('/500');
+        return;
+      }
+      if (status >= 404 && status < 422) {
+        router.push('/404');
+        return;
+      }
+    })
+    .finally(() => {
+      qprogress.finish();
+    });
+}

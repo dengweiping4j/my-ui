@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import { apiServer } from '@/utils/constants';
 
 const api = {
-  redis: '/redis/api/redis',
+  redis: '/util/api/util',
 };
 
 export async function read(params) {

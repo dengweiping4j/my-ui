@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Divider, Input, Modal, Tabs } from 'antd';
-import { connect } from 'dva';
+import { Button, Divider, Input, Tabs } from 'antd';
 
 const { TabPane } = Tabs;
 
-@connect(({ login }) => ({
-  login,
-}))
-class LoginPage extends Component {
+class LoginModal extends Component {
 
   constructor(props) {
     super(props);
@@ -37,36 +33,20 @@ class LoginPage extends Component {
     this.props.onCancel();
   };
 
-  onOk = () => {
+  login = () => {
     const { formData } = this.state;
+    console.log('formData', formData);
 
-    this.props.dispatch({
-      type: 'user/login',
-      payload: {
-        data: formData,
-      },
-      callback: response => {
-        console.log('response', response);
-        this.props.onOk();
-      },
-    });
+    if (this.props.login) {
+      this.props.login(formData);
+    }
   };
 
   render() {
-
-    const { visible } = this.props;
     const { currentTab, formData } = this.state;
     const { userName, password } = formData;
 
-    return <Modal
-      visible={visible}
-      width={400}
-      style={{ top: 200 }}
-      footer={null}
-      maskClosable={false}
-      destroyOnClose={true}
-      onCancel={this.cancel}
-    >
+    return <div style={{...this.props.style}}>
       <Tabs activeKey={currentTab} onChange={this.onChange}>
         <TabPane tab='登录' key='1'>
           <Input
@@ -87,7 +67,14 @@ class LoginPage extends Component {
           />
           <Divider style={{ margin: '10px 0px' }} />
 
-          <Button type={'primary'} style={{ marginTop: '20px' }} onClick={this.onOk} block>登录</Button>
+          <Button
+            type={'primary'}
+            style={{ marginTop: '20px' }}
+            onClick={this.login}
+            block
+          >
+            登录
+          </Button>
 
           <div style={{ marginTop: '20px' }}>
             <div style={{ fontSize: '12px', color: '#525253' }}>登录即代表同意《隐私保护协议》</div>
@@ -108,8 +95,8 @@ class LoginPage extends Component {
 
         </TabPane>
       </Tabs>
-    </Modal>;
+    </div>;
   }
 }
 
-export default LoginPage;
+export default LoginModal;
