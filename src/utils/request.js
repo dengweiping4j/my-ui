@@ -95,9 +95,9 @@ export default function request(url, option) {
 
   const defaultOptions = {
     credentials: 'include',
-    headers: {
+/*    headers: {
       'X-CSRF-TOKEN': localStorage.getItem(csrfTokenKey) || '',
-    },
+    },*/
   };
 
 

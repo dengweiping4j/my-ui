@@ -18,7 +18,10 @@ class BasicLayout extends Component {
   };
 
   render() {
-    const data = {
+
+    const isLogin = document.cookie.indexOf('token') !== -1;
+
+    const menuData = [{
       label: '实用工具',
       children: [
         {
@@ -40,7 +43,26 @@ class BasicLayout extends Component {
           path: '',
         },
       ],
-    };
+    }, {
+      label: '技术博客',
+      children: [
+        {
+          label: '著名LSP伍浪被捕',
+          description: 'LSP伍浪昨日在足浴城被捕，被警方当场没收作案工具',
+          path: '12001',
+        },
+        {
+          label: '著名LSP伍浪被捕',
+          description: 'LSP伍浪昨日在足浴城被捕，被警方当场没收作案工具',
+          path: '12002',
+        },
+      ],
+    }];
+
+    const menuList = [];
+    menuData.forEach((item, index) => {
+      menuList.push(<DMenu data={item} overlayStyle={{ color: '#fff' }} key={index} />);
+    });
 
     const path = this.props.location.pathname;
 
@@ -48,7 +70,7 @@ class BasicLayout extends Component {
       <div>
         <div className={styles['header']} style={{ height: path === '/' ? '600px' : '90px' }}>
           <div className={styles['menu-bar']}>
-            <div style={{ display: 'flex' }}>
+            <div className={styles['menu-bar-one']}>
               <div style={{
                 width: 40,
                 height: 40,
@@ -68,15 +90,16 @@ class BasicLayout extends Component {
               }}>简单实用的编码利器，减少令人乏味的重复劳动</span>
             </div>
 
-            <div style={{ display: 'flex', marginTop: 5 }}>
+            <div className={styles['menu-bar-two']}>
               <a style={{ color: '#fff' }} href={'/'}>首页</a>
-              <DMenu data={data} overlayStyle={{ color: '#fff' }} />
-              <DMenu data={data} overlayStyle={{ color: '#fff' }} />
+              {menuList}
             </div>
 
-            <div style={{ marginTop: '5px' }}>
-              <a style={{ color: '#fff' }} onClick={this.toLogin}>登录 / 注册</a>
-            </div>
+            <span className={styles['menu-bar-three']}>
+              {isLogin ?
+                <a style={{ color: '#fff' }} onClick={this.toLogin}>注销</a>
+                : <a style={{ color: '#fff' }} onClick={this.toLogin}>登录 / 注册</a>}
+            </span>
 
           </div>
 
@@ -96,8 +119,10 @@ class BasicLayout extends Component {
         {this.props.children}
 
         <div className={styles['footer']}>
-          <span style={{ color: '#fff' }}>Copyright © 2020 平平软件技术有限公司</span>
-          <a style={{ marginLeft: '20px', color: '#3765a1' }}>weipingdeng@qq.com</a>
+          <div style={{ color: '#fff', marginBottom: '10px' }}>Copyright © 2020 平平技术有限公司</div>
+          <a style={{ marginLeft: '20px', color: '#3765a1' }}>邮箱：weipingdeng@qq.com</a>
+          <a style={{ marginLeft: '20px', color: '#3765a1' }}>QQ: 1768159807</a>
+          <a style={{ marginLeft: '20px', color: '#3765a1' }}>电话/微信: 17620141235</a>
         </div>
 
       </div>

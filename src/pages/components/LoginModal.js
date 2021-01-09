@@ -46,11 +46,11 @@ class LoginModal extends Component {
     const { currentTab, formData } = this.state;
     const { userName, password } = formData;
 
-    return <div style={{...this.props.style}}>
+    return <div className={this.props.className}>
       <Tabs activeKey={currentTab} onChange={this.onChange}>
         <TabPane tab='登录' key='1'>
           <Input
-            style={{ marginTop: '20px' }}
+            style={{ marginTop: '40px' }}
             placeholder={'用户名'}
             value={userName}
             onChange={(e) => this.onFormChange('userName', e.target.value)}
@@ -69,7 +69,7 @@ class LoginModal extends Component {
 
           <Button
             type={'primary'}
-            style={{ marginTop: '20px' }}
+            style={{ marginTop: '40px' }}
             onClick={this.login}
             block
           >
@@ -78,7 +78,7 @@ class LoginModal extends Component {
 
           <div style={{ marginTop: '20px' }}>
             <div style={{ fontSize: '12px', color: '#525253' }}>登录即代表同意《隐私保护协议》</div>
-            <div style={{ marginTop: '80px', display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ marginTop: '120px', display: 'flex', justifyContent: 'space-between' }}>
               <div style={{ color: '#525253', margin: '15px 0px' }}><h3>与我联系</h3></div>
               <div>
                 <a href={'https://blog.csdn.net/qq_27574367'}>

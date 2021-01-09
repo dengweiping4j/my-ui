@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import { apiServer } from '@/utils/constants';
 
 const api = {
-  user: '/util/api/login',
+  user: '/auth/login',
 };
 
 export async function login(params) {

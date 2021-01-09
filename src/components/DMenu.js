@@ -14,7 +14,15 @@ class DMenu extends Component {
         menuItem.push(<Menu.Item style={{ padding: 0 }} key={index}>
           <a href={item.path} style={{ padding: '20px' }}>
             <div style={{ display: 'flex', padding: '0px 10px' }}>
-              <img src={item.img} style={{ width: 45, height: 40, margin: '5px 10px' }} />
+              <img
+                src={item.img}
+                style={{
+                  width: 45,
+                  height: 40,
+                  margin: '5px 10px',
+                  display: item.img ? '' : 'none',
+                }}
+              />
               <div>
                 <h3 className={styles['label']}>{item.label}</h3>
                 <span className={styles['description']}>{item.description}</span>
