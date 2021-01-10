@@ -12,7 +12,7 @@ export default {
       links: [
         {
           rel: 'icon',
-          href: '/images/logo2.svg',
+          href: '/images/logo.svg',
         },
       ],
       dll: false,
