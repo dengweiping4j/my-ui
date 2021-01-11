@@ -95,11 +95,11 @@ class BasicLayout extends Component {
               {menuList}
             </div>
 
-            <span className={styles['menu-bar-three']}>
+            <div className={styles['menu-bar-three']}>
               {isLogin ?
                 <a style={{ color: '#fff' }} onClick={this.toLogin}>注销</a>
                 : <a style={{ color: '#fff' }} onClick={this.toLogin}>登录 / 注册</a>}
-            </span>
+            </div>
 
           </div>
 

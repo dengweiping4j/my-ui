@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import { apiServer } from '@/utils/constants';
 
 const api = {
-  generate: '/api/generator',
+  generate: '/generator/api/generator',
 };
 
 export async function read(params) {

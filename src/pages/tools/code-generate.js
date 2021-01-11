@@ -12,6 +12,9 @@ class CodeGenerate extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      currentDatabase: undefined,
+    };
   }
 
   componentDidMount() {
@@ -26,25 +29,37 @@ class CodeGenerate extends Component {
     });
   }
 
+  databaseChange = id => {
+    this.setState({
+      currentDatabase: id,
+    });
+  };
+
   render() {
+
+    const { currentDatabase } = this.state;
 
     const datasource = [
       {
+        id: '1001',
         name: '测试数据源',
         ip: '192.168.11.59',
         database: 'datag',
       },
       {
+        id: '1002',
         name: '测试数据源',
         ip: '192.168.11.59',
         database: 'datag',
       },
       {
+        id: '1003',
         name: '测试数据源',
         ip: '192.168.11.59',
         database: 'datag',
       },
       {
+        id: '1004',
         name: '测试数据源',
         ip: '192.168.11.59',
         database: 'datag',
@@ -112,7 +127,7 @@ class CodeGenerate extends Component {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
-        render: (text, record) => <a>下载</a>,
+        render: (text, record) => <a>查看</a>,
       },
     ];
 
@@ -120,7 +135,7 @@ class CodeGenerate extends Component {
       <div className={styles['left']}>
 
         <div className={styles['left-one']}>
-          <span>数据连接</span>
+          <span>数据源</span>
           <Button>新建</Button>
         </div>
 
@@ -138,9 +153,16 @@ class CodeGenerate extends Component {
             grid={{ gutter: 16, column: 1 }}
             dataSource={datasource}
             renderItem={(item, index) => (
-              <List.Item key={index}>
-                <img src={'/images/database.svg'} style={{ width: '20px', height: '25px' }} />
-                <a style={{ color: '#2f75d9', marginLeft: '10px' }}>
+              <List.Item
+                key={index}
+                style={{
+                  background: currentDatabase === item.id ? '#e8f0fe' : '',
+                  padding: '5px',
+                  margin: '2px',
+                }}
+              >
+                <img src={'/images/database.svg'} width={20} height={25} />
+                <a style={{ color: '#000', marginLeft: '10px' }} onClick={() => this.databaseChange(item.id)}>
                   {item.name}（{item.ip}/{item.database}）
                 </a>
               </List.Item>
@@ -152,7 +174,7 @@ class CodeGenerate extends Component {
       <Divider type={'vertical'} className={styles['divider']} />
 
       <div className={styles['right']}>
-        <Button type={'primary'}>一键生成</Button>
+        <Button type={'primary'}>快速生成</Button>
 
         <Table
           style={{ marginTop: '20px' }}
