@@ -190,10 +190,8 @@ class CodeGenerate extends Component {
         callback: (response) => {
           if (response.code === 'SUCCEED') {
             message.success('操作成功');
-
             this.findAll();
-
-            this.this.setState({
+            this.setState({
               dbVisible: false,
               submitLoading: false,
             });
@@ -320,25 +318,23 @@ class CodeGenerate extends Component {
       return;
     }
 
-    window.location.href = 'http://localhost:8769/generator/api/generator/code?dataConnectionId=' + currentDatabase + '&tables=' + filterTables.join() + '&moduleName=' + generatorData.moduleName + '&packageName=' + generatorData.packageName + '&author=' + generatorData.author;
-
-    /*
+    //window.location.href = 'http://localhost:8769/generator/api/generator/code?dataConnectionId=' + currentDatabase + '&tables=' + filterTables.join() + '&moduleName=' + generatorData.moduleName + '&packageName=' + generatorData.packageName + '&author=' + generatorData.author;
 
     generatorData['tables'] = filterTables;
     generatorData['dataConnectionId'] = currentDatabase;
     this.props.dispatch({
-          type: 'generator/generatorSave',
-          payload: {
-            data: generatorData,
-          }, callback: (response) => {
+      type: 'generator/generatorSave',
+      payload: {
+        data: generatorData,
+      }, callback: (response) => {
 
-            window.location.href="/generator/api/generator/code?tables=" + tableNames.join() + "&moduleName=" + moduleName + "&packageName=" + packageName + "&author=" + author;
+        window.location.href = '';
 
-            this.setState({
-              generatorVisible: false,
-            });
-          },
-        });*/
+        this.setState({
+          generatorVisible: false,
+        });
+      },
+    });
   };
 
   generatorCancel = () => {
