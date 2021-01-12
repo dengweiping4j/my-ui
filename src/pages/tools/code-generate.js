@@ -1,33 +1,70 @@
 import React, { Component } from 'react';
 import styles from './code-generate.less';
-import { Button, Divider, Input, List, Table } from 'antd';
+import { Button, Divider, Input, List, message, Table } from 'antd';
 import { connect } from 'dva';
+import DatabaseModal from '@/pages/tools/components/DatabaseModal';
+import DMessage from '@/components/Alert/DMessage';
+import GeneratorModal from '@/pages/tools/components/GeneratorModal';
 
 const { Search } = Input;
 
-@connect(({ redis }) => ({
-  redis,
+@connect(({ generator }) => ({
+  generator,
 }))
 class CodeGenerate extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      tables: [],
+      selectedKeys: [],
+      generatorVisible: false,
+      dataConnections: [],
       currentDatabase: undefined,
+      dbVisible: false,
+      modalData: {
+        isUrlLocked: true,
+        type: 'MySQL',
+        version: '5.1',
+        name: undefined,
+        description: undefined,
+        database: undefined,
+        schema: 'public',
+        ip: undefined,
+        port: '3306',
+        username: undefined,
+        password: undefined,
+        url: undefined,
+      },
+      errorVisible: false,
+      errorMessage: undefined,
+      errorDetail: undefined,
+      generatorData: {
+        moduleName: undefined,
+        packageName: undefined,
+        author: undefined,
+        tables: [],
+      },
     };
   }
 
   componentDidMount() {
+    this.findAll();
+  }
+
+  findAll = () => {
     this.props.dispatch({
-      type: 'redis/read',
-      payload: {
-        name: 'name',
-      },
+      type: 'generator/getDataConnections',
       callback: response => {
-        console.log('data', response);
+        if (response && response.length > 0) {
+          this.setState({
+            dataConnections: response,
+            currentDatabase: response[0].id,
+          });
+        }
       },
     });
-  }
+  };
 
   databaseChange = id => {
     this.setState({
@@ -35,36 +72,294 @@ class CodeGenerate extends Component {
     });
   };
 
-  render() {
-
+  generator = () => {
     const { currentDatabase } = this.state;
+    if (!currentDatabase) {
+      message.error('请先选择数据源');
+      return;
+    }
 
-    const datasource = [
-      {
-        id: '1001',
-        name: '测试数据源',
-        ip: '192.168.11.59',
-        database: 'datag',
+    this.props.dispatch({
+      type: 'generator/findTables',
+      payload: {
+        dataConnectionId: currentDatabase,
       },
-      {
-        id: '1002',
-        name: '测试数据源',
-        ip: '192.168.11.59',
-        database: 'datag',
+      callback: response => {
+        if (response && response.code === 'SUCCEED') {
+
+          this.setState({
+            tables: response.data,
+            generatorVisible: true,
+          });
+        } else {
+          message.error(response.message);
+        }
       },
-      {
-        id: '1003',
-        name: '测试数据源',
-        ip: '192.168.11.59',
-        database: 'datag',
+    });
+
+  };
+
+  openDbModal = record => {
+    if (record.id) {
+      const modalData = { ...record };
+      this.setState({
+        chooseVisible: false,
+        dbVisible: true,
+        modalData,
+      });
+    } else {
+      const initData = {
+        type: 'MySQL',
+        version: '5.1',
+        name: undefined,
+        description: undefined,
+        database: undefined,
+        schema: 'public',
+        ip: undefined,
+        port: '3306',
+        username: undefined,
+        password: undefined,
+        url: undefined,
+      };
+
+      this.setState({
+        chooseVisible: false,
+        dbVisible: true,
+        urlEditable: false,
+        modalData: initData,
+      });
+    }
+  };
+
+  onFormChange = (key, value) => {
+    const { modalData } = this.state;
+    modalData[key] = value;
+    if (key === 'type') {
+      modalData['version'] = undefined;
+    }
+
+    this.setState({
+      modalData,
+    });
+  };
+
+  testConnect = () => {
+    if (this.validate()) {
+      this.setState({
+        testLoading: true,
+      });
+      const { modalData } = this.state;
+      this.props.dispatch({
+        type: 'generator/testConnect',
+        payload: {
+          data: modalData,
+        },
+        callback: response => {
+          if (response.code === 'SUCCEED') {
+            message.success('连接成功');
+          } else {
+            this.setState({
+              errorTitle: '连接失败',
+              errorMessage: response.message,
+              errorDetail: response.detail,
+              errorVisible: true,
+              submitLoading: false,
+            });
+          }
+          this.setState({
+            testLoading: false,
+          });
+        },
+      });
+    }
+  };
+
+  onSubmit = () => {
+    if (this.validate()) {
+      this.setState({
+        submitLoading: true,
+      });
+
+      const { modalData } = this.state;
+
+      this.props.dispatch({
+        type: modalData.id ? 'generator/edit' : 'generator/save',
+        payload: {
+          data: modalData,
+        },
+        callback: (response) => {
+          if (response.code === 'SUCCEED') {
+            message.success('操作成功');
+
+            this.findAll();
+
+            this.this.setState({
+              dbVisible: false,
+              submitLoading: false,
+            });
+          } else {
+            this.setState({
+              errorTitle: '连接失败',
+              errorMessage: response.message,
+              errorDetail: response.detail,
+              errorVisible: true,
+              submitLoading: false,
+            });
+          }
+        },
+      });
+    }
+  };
+
+  validate = () => {
+    const { name, database, ip, port, username, password, version } = this.state.modalData;
+    if (!name || name.trim().length === 0) {
+      message.error('请输入连接名称');
+      return false;
+    } else if (!version || version.trim().length === 0) {
+      message.error('请选择数据库版本');
+      return false;
+    } else if (!database || database.trim().length === 0) {
+      message.error('请输入数据库名称');
+      return false;
+    } else if (!ip || ip.trim().length === 0) {
+      message.error('请输入IP地址');
+      return false;
+    } else if (!port || port.trim().length === 0) {
+      message.error('请输入端口号');
+      return false;
+    } else if (!username || username.trim().length === 0) {
+      message.error('请输入用户名');
+      return false;
+    } else if (!password || password.trim().length === 0) {
+      message.error('请输入密码');
+      return false;
+    }
+    return true;
+  };
+
+  onUrlEditableChange = (value) => {
+    this.setState({
+      urlEditable: value,
+    });
+  };
+
+  onCancel = () => {
+    this.setState({
+      sheet: undefined,
+      submitLoading: false,
+      testLoading: false,
+      dbVisible: false,
+      fileVisible: false,
+      loadFileVisible: false,
+      chooseVisible: false,
+      sheetVisible: false,
+    });
+  };
+
+  onSearch = value => {
+    let query = {};
+    query['name'] = value;
+
+    this.props.dispatch({
+      type: 'generator/queryWhere',
+      payload: {
+        queryBuilder: query,
+      }, callback: (response) => {
+        this.setState({
+          dataConnections: response,
+        });
       },
-      {
-        id: '1004',
-        name: '测试数据源',
-        ip: '192.168.11.59',
-        database: 'datag',
-      },
-    ];
+    });
+  };
+
+  errorClose = () => {
+    this.setState({
+      errorVisible: false,
+      errorTitle: undefined,
+      status: 'error',
+      errorMessage: undefined,
+      errorDetail: undefined,
+    });
+  };
+
+  onTableChange = data => {
+    this.setState({
+      tables: data,
+    });
+  };
+
+  onSelectChange = keys => {
+    this.setState({
+      selectedKeys: keys,
+    });
+  };
+
+  onGeneratorChange = (key, value) => {
+    const { generatorData } = this.state;
+    generatorData[key] = value;
+
+    this.setState({
+      generatorData,
+    });
+  };
+
+  generatorSave = () => {
+    const { generatorData, currentDatabase, tables, selectedKeys } = this.state;
+    const filterTables = [];
+
+    selectedKeys.forEach(selectedKey => {
+      const filterTable = tables.filter(item => item.tableName === selectedKey);
+      if (filterTable && filterTable.length > 0) {
+        filterTables.push(filterTable[0].tableName);
+      }
+    });
+
+    if (filterTables.length === 0) {
+      message.error('请选择需要生成代码的数据库表');
+      return;
+    }
+
+    window.location.href = 'http://localhost:8769/generator/api/generator/code?dataConnectionId=' + currentDatabase + '&tables=' + filterTables.join() + '&moduleName=' + generatorData.moduleName + '&packageName=' + generatorData.packageName + '&author=' + generatorData.author;
+
+    /*
+
+    generatorData['tables'] = filterTables;
+    generatorData['dataConnectionId'] = currentDatabase;
+    this.props.dispatch({
+          type: 'generator/generatorSave',
+          payload: {
+            data: generatorData,
+          }, callback: (response) => {
+
+            window.location.href="/generator/api/generator/code?tables=" + tableNames.join() + "&moduleName=" + moduleName + "&packageName=" + packageName + "&author=" + author;
+
+            this.setState({
+              generatorVisible: false,
+            });
+          },
+        });*/
+  };
+
+  generatorCancel = () => {
+    this.setState({
+      generatorData: {},
+      generatorVisible: false,
+    });
+  };
+
+  render() {
+    const {
+      tables,
+      generatorVisible,
+      dataConnections,
+      currentDatabase,
+      modalData,
+      dbVisible,
+      submitLoading,
+      testLoading,
+      generatorData,
+    } = this.state;
 
     const data = [
       {
@@ -99,6 +394,12 @@ class CodeGenerate extends Component {
 
     const columns = [
       {
+        title: '序号',
+        dataIndex: 'sn',
+        key: 'sn',
+        render: (text, record, index) => index + 1,
+      },
+      {
         title: '项目名称',
         dataIndex: 'project',
         key: 'project',
@@ -131,12 +432,12 @@ class CodeGenerate extends Component {
       },
     ];
 
-    return <div style={{ width: '100%', padding: 20, display: 'flex' }}>
+    return <div style={{ width: '100%', display: 'flex' }}>
       <div className={styles['left']}>
 
         <div className={styles['left-one']}>
           <span>数据源</span>
-          <Button>新建</Button>
+          <Button onClick={this.openDbModal}>新建</Button>
         </div>
 
         <div className={styles['left-two']}>
@@ -144,25 +445,29 @@ class CodeGenerate extends Component {
             placeholder='请输入搜索内容'
             allowClear
             enterButton='搜索'
+            onSearch={this.onSearch}
           />
         </div>
 
         <div className={styles['left-three']}>
           <List
-            style={{ marginTop: '20px' }}
+            className={styles['list']}
             grid={{ gutter: 16, column: 1 }}
-            dataSource={datasource}
+            dataSource={dataConnections}
             renderItem={(item, index) => (
               <List.Item
                 key={index}
-                style={{
-                  background: currentDatabase === item.id ? '#e8f0fe' : '',
-                  padding: '5px',
-                  margin: '2px',
-                }}
+                className={item.id === currentDatabase ? styles['item-selected'] : styles['item']}
               >
                 <img src={'/images/database.svg'} width={20} height={25} />
-                <a style={{ color: '#000', marginLeft: '10px' }} onClick={() => this.databaseChange(item.id)}>
+                <a
+                  style={{
+                    color: item.id === currentDatabase ? '#008ff6' : '#000',
+                    marginLeft: '10px',
+                  }}
+                  onClick={() => this.databaseChange(item.id)}
+                  title={`${item.name}（${item.ip}/${item.database}）`}
+                >
                   {item.name}（{item.ip}/{item.database}）
                 </a>
               </List.Item>
@@ -174,14 +479,53 @@ class CodeGenerate extends Component {
       <Divider type={'vertical'} className={styles['divider']} />
 
       <div className={styles['right']}>
-        <Button type={'primary'}>快速生成</Button>
+        <Button type={'primary'} onClick={this.generator}>快速生成</Button>
 
+        <div style={{ marginTop: '20px' }}><h3>历史记录：</h3></div>
         <Table
-          style={{ marginTop: '20px' }}
+          rowKey={'sn'}
+          style={{ marginTop: '5px' }}
           dataSource={data}
           columns={columns}
         />
       </div>
+
+      <GeneratorModal
+        tables={tables}
+        visible={generatorVisible}
+        onTableChange={this.onTableChange}
+        onSelectChange={this.onSelectChange}
+        onFormChange={this.onGeneratorChange}
+        data={generatorData}
+        onSubmit={this.generatorSave}
+        onCancel={this.generatorCancel}
+      />
+
+      <DatabaseModal
+        style={{ top: 100 }}
+        data={modalData}
+        visible={dbVisible}
+        onFormChange={this.onFormChange}
+        testConnect={this.testConnect}
+        onSubmit={this.onSubmit}
+        onEdit={this.onEdit}
+        urlEditable={this.state.urlEditable}
+        onUrlEditableChange={this.onUrlEditableChange}
+        onCancel={this.onCancel}
+        testLoading={testLoading}
+        submitLoading={submitLoading}
+      />
+
+      <DMessage
+        style={{ marginTop: 80 }}
+        visible={this.state.errorVisible}
+        status={'ERROR'}
+        title={this.state.errorTitle}
+        message={this.state.errorMessage}
+        detail={this.state.errorDetail}
+        onCancel={this.errorClose}
+      />
+
     </div>;
   }
 }

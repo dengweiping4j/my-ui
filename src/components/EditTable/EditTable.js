@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Button, Checkbox, Form, Input, message, Popconfirm, Radio, Select, Table } from 'antd';
 import styles from './EditTable.less';
-import SearchInput from '@/components/Can/SearchInput';
+import SearchInput from '@/components/SearchInput';
 
 const EditableContext = React.createContext();
 const { Option, OptGroup } = Select;
@@ -414,7 +414,7 @@ class EditTable extends React.Component {
         width: 80,
         render: (text, record) =>
           dataSource.length > 0 ? (
-            <Popconfirm title="确定要删除吗?" onConfirm={() => this.handleDelete(record)}>
+            <Popconfirm title='确定要删除吗?' onConfirm={() => this.handleDelete(record)}>
               <a>删除</a>
             </Popconfirm>
           ) : null,
@@ -443,7 +443,7 @@ class EditTable extends React.Component {
               isAddRow && isAddRow === true ?
                 <Button
                   onClick={this.handleAdd}
-                  type="primary"
+                  type='primary'
                   style={{
                     margin: '0px 10px 10px 0px',
                   }}
@@ -454,7 +454,7 @@ class EditTable extends React.Component {
             }
             {
               isDeleteRow && selectedRowKeys && selectedRowKeys.length > 0 ?
-                <Popconfirm title="确定删除吗?" onConfirm={() => this.handleDeletes(selectedRowKeys)}>
+                <Popconfirm title='确定删除吗?' onConfirm={() => this.handleDeletes(selectedRowKeys)}>
                   <Button
                     style={{
                       marginBottom: 10,
@@ -471,7 +471,7 @@ class EditTable extends React.Component {
             <SearchInput
               style={{ width: '400px', marginBottom: '10px', ...searchStyle }}
               addonBefore={selectBefore}
-              placeholder="关键字搜索"
+              placeholder='关键字搜索'
               onSearch={this.onSearch}
             />
           </div>

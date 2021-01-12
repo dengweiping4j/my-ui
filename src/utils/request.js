@@ -8,6 +8,7 @@ import hash from 'hash.js';
 import { loginURL } from '@/utils/constants';
 
 import QProgress from 'qier-progress';
+import { message } from 'antd';
 
 const qprogress = new QProgress();
 
@@ -95,9 +96,9 @@ export default function request(url, option) {
 
   const defaultOptions = {
     credentials: 'include',
-/*    headers: {
-      'X-CSRF-TOKEN': localStorage.getItem(csrfTokenKey) || '',
-    },*/
+    /*    headers: {
+          'X-CSRF-TOKEN': localStorage.getItem(csrfTokenKey) || '',
+        },*/
   };
 
 
@@ -142,8 +143,8 @@ export default function request(url, option) {
       if (status === 401) {
         // @HACK
         /* eslint-disable no-underscore-dangle */
-        console.log('##### 401');
-        // message.error('登录信息已失效，请登录');
+        message.error('登录信息已失效，请重新登录');
+
         if (loginURL === '/login') {
           router.push(loginURL);
         } else {
@@ -152,15 +153,18 @@ export default function request(url, option) {
 
         return;
       }
+
       if (status === 403) {
         console.log('##### 403');
         router.push('/403');
         return;
       }
+
       if (status <= 504 && status >= 500) {
         router.push('/500');
         return;
       }
+
       if (status >= 404 && status < 422) {
         router.push('/404');
         return;

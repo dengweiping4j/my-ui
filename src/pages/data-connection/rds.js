@@ -1,7 +1,7 @@
 import { Divider, List, message, Modal, Radio, Tabs, Tooltip } from 'antd';
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import DatabaseModal from '@/pages/data-connection/components/DatabaseModal';
+import DatabaseModal from '@/pages/tools/components/DatabaseModal';
 import DMessage from '@/components/Alert/DMessage';
 
 const { TabPane } = Tabs;

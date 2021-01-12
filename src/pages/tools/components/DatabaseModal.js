@@ -195,7 +195,7 @@ class DatabaseModal extends Component {
     return (
       <Modal
         width={600}
-        style={{ top: 20 }}
+        style={{ ...this.props.style }}
         title={data.id ? '编辑数据连接' : '创建数据连接'}
         visible={this.props.visible}
         destroyOnClose={true} footer={null}
