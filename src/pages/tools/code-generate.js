@@ -309,7 +309,7 @@ class CodeGenerate extends Component {
     selectedKeys.forEach(selectedKey => {
       const filterTable = tables.filter(item => item.tableName === selectedKey);
       if (filterTable && filterTable.length > 0) {
-        filterTables.push(filterTable[0].tableName);
+        filterTables.push(filterTable[0]);
       }
     });
 
@@ -328,7 +328,18 @@ class CodeGenerate extends Component {
         data: generatorData,
       }, callback: (response) => {
 
-        window.location.href = '';
+        const aLink = document.createElement('a');
+        document.body.appendChild(aLink);
+        aLink.style.display = 'none';
+
+        /*const binaryData = [];
+        binaryData.push(response);*/
+        const objectUrl = window.URL.createObjectURL(new Blob(response, { type: 'application/zip' }));
+        aLink.href = objectUrl;
+        aLink.download = 'aaa.zip';
+        aLink.click();
+        document.body.removeChild(aLink);
+
 
         this.setState({
           generatorVisible: false,
