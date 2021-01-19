@@ -21,47 +21,51 @@ class BasicLayout extends Component {
 
     const isLogin = document.cookie.indexOf('token') !== -1;
 
-    const menuData = [{
-      label: '实用工具',
-      children: [
-        {
-          label: '代码生成器',
-          description: '一款好用智能的代码生成工具',
-          img: '/images/1.png',
-          path: '/#/tools/code-generate',
-        },
-        {
-          label: 'JSON格式化',
-          description: '一键格式化JSON数据',
-          img: '/images/2.png',
-          path: '',
-        },
-        {
-          label: '加密工具',
-          description: 'MD5加密、对称加密等',
-          img: '/images/3.png',
-          path: '',
-        },
-      ],
-    }, {
-      label: '技术博客',
-      children: [
-        {
-          label: '著名LSP伍浪被捕',
-          description: 'LSP伍浪昨日在足浴城被捕，被警方当场没收作案工具',
-          path: '12001',
-        },
-        {
-          label: '著名LSP伍浪被捕',
-          description: 'LSP伍浪昨日在足浴城被捕，被警方当场没收作案工具',
-          path: '12002',
-        },
-      ],
-    }];
+    const menuData = [
+      {
+        label: '首页',
+        children: [],
+        path: '/',
+      },
+      {
+        label: '实用工具',
+        children: [
+          {
+            label: '代码生成器',
+            description: '一款好用智能的代码生成工具',
+            img: '/images/1.png',
+            path: '/#/tools/code-generate',
+          },
+          {
+            label: 'JSON格式化',
+            description: '一键格式化JSON数据',
+            img: '/images/2.png',
+            path: '',
+          },
+          {
+            label: '加密工具',
+            description: 'MD5加密、对称加密等',
+            img: '/images/3.png',
+            path: '',
+          },
+        ],
+      },
+      {
+        label: '技术博客',
+        children: [],
+        path: '/#/blog',
+      },
+    ];
 
     const menuList = [];
     menuData.forEach((item, index) => {
-      menuList.push(<DMenu data={item} overlayStyle={{ color: '#fff' }} key={index} />);
+      if (item.children.length > 0) {
+        menuList.push(<DMenu data={item} overlayStyle={{ color: '#fff' }} key={index} />);
+      } else {
+        menuList.push(<a href={item.path} style={{ marginLeft: '20px', color: '#fff' }}>
+          {item.label}
+        </a>);
+      }
     });
 
     const path = this.props.location.pathname;
@@ -91,7 +95,6 @@ class BasicLayout extends Component {
             </div>
 
             <div className={styles['menu-bar-two']}>
-              <a style={{ color: '#fff' }} href={'/'}>首页</a>
               {menuList}
             </div>
 
