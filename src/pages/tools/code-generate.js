@@ -5,6 +5,8 @@ import { connect } from 'dva';
 import DatabaseModal from '@/pages/tools/components/DatabaseModal';
 import DMessage from '@/components/Alert/DMessage';
 import GeneratorModal from '@/pages/tools/components/GeneratorModal';
+import { apiServer } from '@/utils/constants';
+import { getApi } from './services/services';
 
 const { Search } = Input;
 
@@ -318,34 +320,28 @@ class CodeGenerate extends Component {
       return;
     }
 
-    //window.location.href = 'http://localhost:8769/generator/api/generator/code?dataConnectionId=' + currentDatabase + '&tables=' + filterTables.join() + '&moduleName=' + generatorData.moduleName + '&packageName=' + generatorData.packageName + '&author=' + generatorData.author;
-
     generatorData['tables'] = filterTables;
     generatorData['dataConnectionId'] = currentDatabase;
-    this.props.dispatch({
-      type: 'generator/generatorSave',
-      payload: {
-        data: generatorData,
-      }, callback: (response) => {
 
-        const aLink = document.createElement('a');
-        document.body.appendChild(aLink);
-        aLink.style.display = 'none';
+    const url = `${apiServer + getApi().generator}`;
 
-        /*const binaryData = [];
-        binaryData.push(response);*/
-        const objectUrl = window.URL.createObjectURL(new Blob(response, { type: 'application/zip' }));
-        aLink.href = objectUrl;
-        aLink.download = 'aaa.zip';
-        aLink.click();
-        document.body.removeChild(aLink);
-
-
-        this.setState({
-          generatorVisible: false,
-        });
-      },
-    });
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(generatorData),
+      credentials: 'include',
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+    })
+      .then(res => res.blob())
+      .then(blob => {
+        const a = document.createElement('a');
+        const url = window.URL.createObjectURL(blob);
+        a.href = url;
+        a.download = currentDatabase + '.zip';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      });
   };
 
   generatorCancel = () => {

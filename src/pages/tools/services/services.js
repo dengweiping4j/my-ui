@@ -48,3 +48,7 @@ export async function generatorSave(params) {
     body: params.data,
   });
 }
+
+export function getApi () {
+  return api;
+}
