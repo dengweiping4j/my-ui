@@ -47,6 +47,7 @@ class CodeGenerate extends Component {
         author: undefined,
         tables: [],
       },
+      loading: false,
     };
   }
 
@@ -308,12 +309,24 @@ class CodeGenerate extends Component {
     const { generatorData, currentDatabase, tables, selectedKeys } = this.state;
     const filterTables = [];
 
+    const regExp = new RegExp('^[a-zA-Z_]{1}\\w{0,100}$');
+
+    const badTableName = [];
     selectedKeys.forEach(selectedKey => {
-      const filterTable = tables.filter(item => item.tableName === selectedKey);
-      if (filterTable && filterTable.length > 0) {
-        filterTables.push(filterTable[0]);
+      if (selectedKey.match(regExp)) {
+        const filterTable = tables.filter(item => item.tableName === selectedKey);
+        if (filterTable && filterTable.length > 0) {
+          filterTables.push(filterTable[0]);
+        }
+      } else {
+        badTableName.push(selectedKey);
       }
     });
+
+    if (badTableName.length > 0) {
+      message.error('存在不合法的表名：' + badTableName.join());
+      return;
+    }
 
     if (filterTables.length === 0) {
       message.error('请选择需要生成代码的数据库表');
@@ -325,16 +338,25 @@ class CodeGenerate extends Component {
 
     const url = `${apiServer + getApi().generator}`;
 
+    this.setState({
+      loading: true,
+    });
+
     fetch(url, {
       method: 'POST',
       body: JSON.stringify(generatorData),
-      credentials: 'include',
+      credentials: 'include',//使用"include"表示无论是否跨域，都会携带cookie
       headers: new Headers({
         'Content-Type': 'application/json',
       }),
     })
       .then(res => res.blob())
       .then(blob => {
+
+        this.setState({
+          loading: false,
+        });
+
         const a = document.createElement('a');
         const url = window.URL.createObjectURL(blob);
         a.href = url;
@@ -502,6 +524,7 @@ class CodeGenerate extends Component {
         data={generatorData}
         onSubmit={this.generatorSave}
         onCancel={this.generatorCancel}
+        loading={this.state.loading}
       />
 
       <DatabaseModal

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Input, Modal } from 'antd';
+import { Input, Modal, Spin } from 'antd';
 import EditTable from '@/components/EditTable/EditTable';
 import styles from './GeneratorModal.less';
 
@@ -72,49 +72,52 @@ class GeneratorModal extends Component {
       onCancel={this.handleCancel}
       cancelText={'取消'}
     >
+      <Spin delay={500} spinning={this.props.loading} tip={'代码生成中'}>
 
-      <div className={styles['item']}>
-        <span className={styles['label']}>项目名称：</span>
-        <Input
-          key={'moduleName'}
-          value={data['moduleName']}
-          placeholder={'请填写项目名称'}
-          onChange={(e) => this.onFormChange('moduleName', e.target.value)}
+        <div className={styles['item']}>
+          <span className={styles['label']}>项目名称：</span>
+          <Input
+            key={'moduleName'}
+            value={data['moduleName']}
+            placeholder={'请填写项目名称'}
+            onChange={(e) => this.onFormChange('moduleName', e.target.value)}
+          />
+        </div>
+
+        <div className={styles['item']}>
+          <span className={styles['label']}>包名：</span>
+          <Input
+            key={'packageName'}
+            value={data['packageName']}
+            placeholder={'请填写包路径'}
+            onChange={(e) => this.onFormChange('packageName', e.target.value)}
+          />
+        </div>
+
+        <div className={styles['item']}>
+          <span className={styles['label']}>作者：</span>
+          <Input
+            key={'author'}
+            value={data['author']}
+            placeholder={'请填写作者姓名'}
+            onChange={(e) => this.onFormChange('author', e.target.value)}
+          />
+        </div>
+
+        <EditTable
+          rowKey={'tableName'}
+          style={{ maxHeight: '300px', overflow: 'auto', marginTop: '20px' }}
+          dataSource={tables}
+          columns={columns}
+          pagination={false}
+          isSelectRows={true}
+          onSelectChange={this.onSelectChange}
+          onChange={this.onTableChange}
+          isSearch={true}
+          searchKeys={['tableName']}
         />
-      </div>
 
-      <div className={styles['item']}>
-        <span className={styles['label']}>包名：</span>
-        <Input
-          key={'packageName'}
-          value={data['packageName']}
-          placeholder={'请填写包路径'}
-          onChange={(e) => this.onFormChange('packageName', e.target.value)}
-        />
-      </div>
-
-      <div className={styles['item']}>
-        <span className={styles['label']}>作者：</span>
-        <Input
-          key={'author'}
-          value={data['author']}
-          placeholder={'请填写作者姓名'}
-          onChange={(e) => this.onFormChange('author', e.target.value)}
-        />
-      </div>
-
-      <EditTable
-        rowKey={'tableName'}
-        style={{ maxHeight: '300px', overflow: 'auto', marginTop: '20px' }}
-        dataSource={tables}
-        columns={columns}
-        pagination={false}
-        isSelectRows={true}
-        onSelectChange={this.onSelectChange}
-        onChange={this.onTableChange}
-        isSearch={true}
-        searchKeys={['tableName']}
-      />
+      </Spin>
     </Modal>;
   }
 
