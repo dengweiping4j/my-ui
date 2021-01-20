@@ -12,7 +12,7 @@ export async function get(params) {
 export async function query(params) {
   return request(apiServer + api.blog + '/query?page=' + params.page + '&pageSize=' + params.pageSize, {
     method: 'POST',
-    body: params.data,
+    body: params.queryData,
   });
 }
 

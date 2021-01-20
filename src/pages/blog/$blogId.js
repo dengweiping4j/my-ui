@@ -23,8 +23,6 @@ class BlogPage extends Component {
       const { pathname } = this.props.location;
       const blogId = pathname.substring(pathname.lastIndexOf('/') + 1);
 
-      console.log('blogId',blogId);
-
       if (blogId) {
         this.props.dispatch({
           type: 'blog/get',
@@ -49,7 +47,7 @@ class BlogPage extends Component {
   render() {
 
     return <div style={{ margin: '40px' }}>
-      {/* <Editor
+     {/* <Editor
         toolbar={<span></span>}
         value={this.state.data}
         preview={true}

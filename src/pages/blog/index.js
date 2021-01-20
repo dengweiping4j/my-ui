@@ -12,6 +12,9 @@ class BlogIndex extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      page: 1,
+      pageSize: 10,
+      total: 0,
       data: [],
     };
   }
@@ -22,11 +25,19 @@ class BlogIndex extends Component {
       payload: {
         page: 1,
         pageSize: 20,
+        queryData: {
+          content: '测试',
+        },
       },
       callback: response => {
-        this.setState({
-          data: response,
-        });
+        if (response) {
+          this.setState({
+            data: response.data,
+            page: response.page,
+            pageSize: response.pageSize,
+            total: response.total,
+          });
+        }
       },
     });
   }
@@ -40,26 +51,13 @@ class BlogIndex extends Component {
   };
 
   render() {
-    const data = [
-      {
-        id: '6dc74fe3-b3d9-43fc-a99d-f073bd33b2e5',
-        title: '基于React+SpringCloud的个人博客系统（含代码生成工具）',
-        description: '程序员工具箱-前端所用技术Reactumiantd项目地址：my-ui程序员工具箱-后端所用技术springbootspringcloudjwtredismysqljpa项目地址：programmer-tool-cloud-svc目前实现了登录认证，token生成等功能，在zuul模块通过gateway拦截器对请求进行拦截，验证相关权限,程序员工具箱-前端所用技术Reactumiantd项目地址：my-ui程序员工具箱-后端所用技术springbootspringcloudjwtredismysqljpa项目地址：programmer-tool-cloud-svc目前实现了登录认证，token生成等功能，在zuul模块通过gateway拦截器对请求进行拦截，验证相关权限，通过后访问具体模块...',
-        createDate: '2021-01-20',
-      },
-      {
-        id: '6dc74fe3-b3d9-43fc-a99d-f073bd33b2e5',
-        title: '基于React+SpringCloud的个人博客系统（含代码生成工具）',
-        description: '程序员工具箱-前端所用技术Reactumiantd项目地址：my-ui程序员工具箱-后端所用技术springbootspringcloudjwtredismysqljpa项目地址：programmer-tool-cloud-svc目前实现了登录认证，token生成等功能，在zuul模块通过gateway拦截器对请求进行拦截，验证相关权限,程序员工具箱-前端所用技术Reactumiantd项目地址：my-ui程序员工具箱-后端所用技术springbootspringcloudjwtredismysqljpa项目地址：programmer-tool-cloud-svc目前实现了登录认证，token生成等功能，在zuul模块通过gateway拦截器对请求进行拦截，验证相关权限，通过后访问具体模块...',
-        createDate: '2021-01-20',
-      },
-      {
-        id: '6dc74fe3-b3d9-43fc-a99d-f073bd33b2e5',
-        title: '基于React+SpringCloud的个人博客系统（含代码生成工具）',
-        description: '程序员工具箱-前端所用技术Reactumiantd项目地址：my-ui程序员工具箱-后端所用技术springbootspringcloudjwtredismysqljpa项目地址：programmer-tool-cloud-svc目前实现了登录认证，token生成等功能，在zuul模块通过gateway拦截器对请求进行拦截，验证相关权限,程序员工具箱-前端所用技术Reactumiantd项目地址：my-ui程序员工具箱-后端所用技术springbootspringcloudjwtredismysqljpa项目地址：programmer-tool-cloud-svc目前实现了登录认证，token生成等功能，在zuul模块通过gateway拦截器对请求进行拦截，验证相关权限，通过后访问具体模块...',
-        createDate: '2021-01-20',
-      },
-    ];
+    const {
+      page,
+      pageSize,
+      total,
+      data,
+    } = this.state;
+
     return <div style={{ margin: '40px' }}>
       <div className={styles['header']}>
         <span className={styles['header-title']}>我的博客</span>
@@ -81,6 +79,11 @@ class BlogIndex extends Component {
         )}
       />
 
+      {total / pageSize > 0 ?
+        <div style={{ margin: '20px 40px' }}>
+          <a>下一页</a>
+        </div>
+        : null}
     </div>;
   }
 }

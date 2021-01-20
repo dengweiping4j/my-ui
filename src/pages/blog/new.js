@@ -52,7 +52,7 @@ class NewBlogPage extends Component {
         },
         callback: response => {
           if (response.code === 'SUCCEED') {
-            router.push('/#/blog');
+            router.push('/blog');
           } else {
             message.error(response.message);
           }
