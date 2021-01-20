@@ -8,7 +8,7 @@ export default {
 
   effects: {
     /**
-     * 创建文档
+     * 查询文档
      * @param payload
      * @param callback
      * @param call
@@ -21,7 +21,19 @@ export default {
       }
     },
 
+    * query({ payload, callback }, { call }) {
+      const result = yield call(services.query, payload);
+      if (callback && typeof callback === 'function') {
+        callback(result);
+      }
+    },
 
+    * create({ payload, callback }, { call }) {
+      const result = yield call(services.create, payload);
+      if (callback && typeof callback === 'function') {
+        callback(result);
+      }
+    },
   },
 
   reducers: {

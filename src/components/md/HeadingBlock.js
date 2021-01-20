@@ -1,7 +1,5 @@
-import React, { PureComponent } from "react";
-import PropTypes from "prop-types";
-import cls from "classnames";
-import Heading from "./Heading";
+import React, { PureComponent } from 'react';
+import Heading from './Heading';
 
 class HeadingBlock extends PureComponent {
   renderHtml = () => {
@@ -11,13 +9,14 @@ class HeadingBlock extends PureComponent {
       const nodeValue = children[0].props.value;
       return (
         <Heading level={`h${level}`} id={nodeValue}>
-          <span className="title">{children}</span>
+          <span className='title'>{children}</span>
         </Heading>
       );
     } else {
       return <>{children}</>;
     }
   };
+
   render() {
     return <>{this.renderHtml()}</>;
   }

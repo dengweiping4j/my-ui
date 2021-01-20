@@ -7,7 +7,11 @@ export default {
     ['umi-plugin-react', {
       antd: true,
       dva: true,
-      dynamicImport: { webpackChunkName: true },
+      dynamicImport: {
+        loadingComponent: './utils/loadable',
+        webpackChunkName: true,
+        level: 3
+      },
       title: '程序员工具箱',
       links: [
         {
@@ -30,7 +34,11 @@ export default {
           /components\//,
         ],
       },
-    }],
+    }]
   ],
-
+  chainWebpack(config, { webpack }) {
+    config.module
+      .rule('raw-loader')
+      .test(/\.md$/);
+  },
 };
