@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { message } from 'antd';
+import { Avatar, Comment, message } from 'antd';
 import CodeBlock from '@/components/md/CodeBlock';
 import HeadingBlock from '@/components/md/HeadingBlock';
 import Markdown from 'react-markdown';
-import Editor from 'for-editor';
 
 @connect(({ blog }) => ({
   blog,
@@ -33,7 +32,11 @@ class BlogPage extends Component {
             console.log(response);
             if (response.code === 'SUCCEED') {
               this.setState({
-                data: response.data.content,
+                author: response.data.author,
+                title: response.data.title,
+                description: response.data.description,
+                content: response.data.content,
+                createDate: response.data.createDate,
               });
             } else {
               message.error(response.message);
@@ -46,20 +49,39 @@ class BlogPage extends Component {
 
   render() {
 
-    return <div style={{ margin: '40px' }}>
-     {/* <Editor
+    const { author, title, description, content, createDate } = this.state;
+
+    return <div style={{ margin: '20px 40px' }}>
+      <Comment
+        //actions={actions}
+        author={<a>{title}</a>}
+        avatar={
+          <Avatar
+            size={34}
+            src={'/images/my.jpg'}
+            alt={author}
+          />
+        }
+        content={<p>{description}</p>}
+        datetime={<span>{createDate}</span>}
+      />
+
+      {/* <Editor
         toolbar={<span></span>}
         value={this.state.data}
         preview={true}
       />*/}
-      <Markdown
-        source={this.state.data}
-        escapeHtml={false}
-        renderers={{
-          code: CodeBlock,
-          heading: HeadingBlock,
-        }}
-      />
+      <div style={{ margin: '20px' }}>
+        <Markdown
+          source={content}
+          escapeHtml={false}
+          renderers={{
+            code: CodeBlock,
+            heading: HeadingBlock,
+          }}
+        />
+      </div>
+
     </div>;
   }
 }

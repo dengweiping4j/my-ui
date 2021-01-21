@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 // 设置高亮样式
-import { coy,atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { tomorrow, prism, solarizedlight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 // 设置高亮的语言
-import { jsx, javascript, java, sql } from 'react-syntax-highlighter/dist/esm/languages/prism';
+import { java, javascript, jsx, sql } from 'react-syntax-highlighter/dist/esm/languages/prism';
 
 class CodeBlock extends PureComponent {
   static propTypes = {
@@ -25,9 +25,18 @@ class CodeBlock extends PureComponent {
 
   render() {
     const { language, value } = this.props;
+
+    /**
+     * 主题
+     * solarizedlight
+     *tomorrow
+     *prism
+     *
+     */
+
     return (
       <figure className='highlight'>
-        <SyntaxHighlighter language={language} style={atomDark}>
+        <SyntaxHighlighter language={language} style={tomorrow}>
           {value}
         </SyntaxHighlighter>
       </figure>

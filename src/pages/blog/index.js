@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { router } from 'umi';
-import { Button, Input, List, Select } from 'antd';
+import { Button, List, Select, Tag } from 'antd';
 import styles from './index.less';
 import debounce from 'lodash/debounce';
+import AuthorInfo from '@/pages/blog/components/AuthorInfo';
 
-const { Search } = Input;
 const { Option } = Select;
 
 @connect(({ blog }) => ({
@@ -22,13 +22,14 @@ class BlogIndex extends Component {
       data: [],
       searchValue: undefined,
       fetching: false,
+      searchResult: [],
     };
     this.lastFetchId = 0;
     this.handleSearch = debounce(this.handleSearch, 500);
   }
 
   componentDidMount() {
-    this.onSearch(' ');
+    this.onSearch('content', '');
   }
 
   toNewPage = () => {
@@ -39,14 +40,14 @@ class BlogIndex extends Component {
     router.push('./blog/' + id);
   };
 
-  onSearch = value => {
+  onSearch = (key, value) => {
     this.props.dispatch({
       type: 'blog/query',
       payload: {
         page: 1,
         pageSize: 20,
         queryData: {
-          content: value,
+          [key]: value,
         },
       },
       callback: response => {
@@ -72,28 +73,34 @@ class BlogIndex extends Component {
     }
 
     this.props.dispatch({
-      type: 'dataEtl/findEtlByJobName',
+      type: 'blog/query',
       payload: {
-        jobName: value,
+        page: 1,
+        pageSize: 20,
+        queryData: {
+          content: value,
+        },
       },
-      callback: (response) => {
+      callback: response => {
         if (response) {
           this.setState({
-            etlJobList: response,
+            searchResult: response.data,
             fetching: false,
             searchValue: value,
           });
         }
       },
     });
+
+  };
+
+  search = () => {
+    const { searchValue } = this.state;
+    this.onSearch('content', searchValue);
   };
 
   handleChange = value => {
-    console.log('value', value);
-
-    this.setState({
-      searchValue: value,
-    });
+    router.push('./blog/' + value);
   };
 
   render() {
@@ -103,66 +110,84 @@ class BlogIndex extends Component {
       total,
       data,
       searchValue,
+      searchResult = [],
     } = this.state;
 
-    const options = [
-      <Option value={'测试'}>测试</Option>,
-    ];
+    const options = [];
+    searchResult.forEach(item => {
+      options.push(<Option value={item.id}>{item.title}</Option>);
+    });
 
-    return <div style={{ margin: '40px' }}>
-      <div className={styles['header']}>
-        <div style={{ width: '60%' }}>
-          <Select
-            className={styles['search']}
-            getPopupContainer={triggerNode => triggerNode.parentNode}
-            showSearch
-            value={searchValue}
-            placeholder={'输入查询内容'}
-            style={this.props.style}
-            defaultActiveFirstOption={false}
-            showArrow={false}
-            filterOption={false}
-            onSearch={this.handleSearch}
-            onChange={this.handleChange}
-            notFoundContent={null}
-            size="large"
-          >
-            {options}
-          </Select>
-          <Button size={'large'} type={'primary'} className={styles['search-button']}>查询</Button>
-        </div>
-
-
-        <Button
-          onClick={this.toNewPage}
-          type={'danger'}
-          style={{ marginRight: '20px' }}
-          size="large"
-        >
-          <img src={'/images/write.svg'} width={25} style={{ marginRight: '5px' }} />开始创作
-        </Button>
+    return <div style={{ margin: '40px', display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ width: '20%' }}>
+        <AuthorInfo />
       </div>
 
-      <List
-        style={{ margin: '20px 40px' }}
-        itemLayout='horizontal'
-        dataSource={data}
-        renderItem={item => (
-          <List.Item className={styles['list']}>
-            <div>
-              <a className={styles['title']} onClick={() => this.toBlogDetail(item.id)}>{item.title}</a>
-              <div className={styles['description']}>{item.description}</div>
-              <span className={styles['createDate']}>{item.createDate}</span>
-            </div>
-          </List.Item>
-        )}
-      />
+      <div style={{ width: '80%' }}>
+        <div className={styles['header']}>
+          <div style={{ width: '60%', marginLeft: '40px' }}>
+            <Select
+              className={styles['search']}
+              getPopupContainer={triggerNode => triggerNode.parentNode}
+              showSearch
+              value={searchValue}
+              placeholder={'输入查询内容'}
+              style={this.props.style}
+              defaultActiveFirstOption={false}
+              showArrow={false}
+              filterOption={false}
+              onSearch={this.handleSearch}
+              onChange={this.handleChange}
+              notFoundContent={null}
+              size='large'
+            >
+              {options}
+            </Select>
+            <Button
+              size={'large'}
+              type={'primary'}
+              className={styles['search-button']}
+              onClick={this.search}
+            >
+              查询
+            </Button>
+          </div>
 
-      {total / pageSize > 0 ?
-        <div style={{ margin: '20px 40px' }}>
-          <a>下一页</a>
+          <Button
+            onClick={this.toNewPage}
+            type={'danger'}
+            style={{ marginRight: '40px' }}
+            size='large'
+          >
+            <img src={'/images/write.svg'} width={25} style={{ marginRight: '5px' }} />开始创作
+          </Button>
         </div>
-        : null}
+
+        <List
+          style={{ margin: '20px 40px' }}
+          itemLayout='horizontal'
+          dataSource={data}
+          renderItem={item => (
+            <List.Item className={styles['list']}>
+              <div>
+                <Tag color='red'>原创</Tag>
+                <a className={styles['title']} onClick={() => this.toBlogDetail(item.id)}>
+                  {item.title}
+                </a>
+                <div className={styles['description']}>{item.description}</div>
+                <div className={styles['footer']}>{item.createDate}</div>
+              </div>
+            </List.Item>
+          )}
+        />
+
+        {total / pageSize > 0 ?
+          <div style={{ width: '100%', textAlign: 'center', margin: '20px 40px' }}>
+            <a>下一页</a>
+          </div>
+          : null}
+      </div>
+
     </div>;
   }
 }
