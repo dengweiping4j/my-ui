@@ -51,7 +51,7 @@ class BlogPage extends Component {
 
     const { author, title, description, content, createDate } = this.state;
 
-    return <div style={{ margin: '20px 40px' }}>
+    return <div style={{ margin: '20px 80px' }}>
       <Comment
         //actions={actions}
         author={<a>{title}</a>}
