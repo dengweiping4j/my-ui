@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { router } from 'umi';
-import { Button, List, Select, Tag } from 'antd';
+import { Button, Divider, List, Select, Tag } from 'antd';
 import styles from './index.less';
 import debounce from 'lodash/debounce';
 import AuthorInfo from '@/pages/blog/components/AuthorInfo';
@@ -94,11 +94,6 @@ class BlogIndex extends Component {
 
   };
 
-  search = () => {
-    const { searchValue } = this.state;
-    this.onSearch('content', searchValue);
-  };
-
   handleChange = value => {
     router.push('./blog/' + value);
   };
@@ -118,40 +113,30 @@ class BlogIndex extends Component {
       options.push(<Option value={item.id}>{item.title}</Option>);
     });
 
-    return <div style={{ margin: '40px', display: 'flex', justifyContent: 'space-between' }}>
-      <div style={{ width: '20%' }}>
+    return <div className={styles['main']}>
+      <div className={styles['left']}>
         <AuthorInfo />
       </div>
 
-      <div style={{ width: '80%' }}>
+      <div className={styles['right']}>
         <div className={styles['header']}>
-          <div style={{ width: '60%', marginLeft: '40px' }}>
-            <Select
-              className={styles['search']}
-              getPopupContainer={triggerNode => triggerNode.parentNode}
-              showSearch
-              value={searchValue}
-              placeholder={'输入查询内容'}
-              style={this.props.style}
-              defaultActiveFirstOption={false}
-              showArrow={false}
-              filterOption={false}
-              onSearch={this.handleSearch}
-              onChange={this.handleChange}
-              notFoundContent={null}
-              size='large'
-            >
-              {options}
-            </Select>
-            <Button
-              size={'large'}
-              type={'primary'}
-              className={styles['search-button']}
-              onClick={this.search}
-            >
-              查询
-            </Button>
-          </div>
+          <Select
+            className={styles['search']}
+            getPopupContainer={triggerNode => triggerNode.parentNode}
+            showSearch
+            value={searchValue}
+            placeholder={'输入查询内容'}
+            style={this.props.style}
+            defaultActiveFirstOption={false}
+            showArrow={false}
+            filterOption={false}
+            onSearch={this.handleSearch}
+            onChange={this.handleChange}
+            notFoundContent={null}
+            size='large'
+          >
+            {options}
+          </Select>
 
           <Button
             onClick={this.toNewPage}
@@ -163,8 +148,12 @@ class BlogIndex extends Component {
           </Button>
         </div>
 
+
+
+        <Divider style={{ margin: 0 }} />
+
         <List
-          style={{ margin: '20px 40px' }}
+          className={styles['content']}
           itemLayout='horizontal'
           dataSource={data}
           renderItem={item => (

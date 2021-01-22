@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import styles from './AuthorInfo.less';
 import { Avatar, Descriptions } from 'antd';
 
 class AuthorInfo extends Component {
   render() {
-    return <div style={{ background: '#f6f6f6', padding: '20px', ...this.props.style }}>
+    return <div style={{ padding: '20px', ...this.props.style }}>
       <div style={{ display: 'flex' }}>
         <Avatar src={'/images/my.jpg'} size={64} alt={'头像'} />
 
@@ -25,9 +24,9 @@ class AuthorInfo extends Component {
         </Descriptions>
 
         <img src={'images/demo/1.png'} width={36} style={{ marginTop: '20px' }} />
-        <img src={'images/demo/2.png'} width={36} style={{ marginTop: '20px' }}/>
-        <img src={'images/demo/3.png'} width={36} style={{ marginTop: '20px' }}/>
-        <img src={'images/demo/4.png'} width={36} style={{ marginTop: '20px' }}/>
+        <img src={'images/demo/2.png'} width={36} style={{ marginTop: '20px' }} />
+        <img src={'images/demo/3.png'} width={36} style={{ marginTop: '20px' }} />
+        <img src={'images/demo/4.png'} width={36} style={{ marginTop: '20px' }} />
       </div>
 
     </div>;
